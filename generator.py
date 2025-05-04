@@ -67,32 +67,12 @@ for strategy_name, prompts in PROMPT_STRATEGY.items():
         output.outputs[0].text.strip() for output in llm.generate(single_turn_questions, sampling_params)
     ]
 
-    def format_double_turn_question(question, single_turn_output):
-        return llm.llm_engine.tokenizer.tokenizer.apply_chat_template(
-            prompts
-            + [
-                {"role": "user", "content": question[0]},
-                {"role": "assistant", "content": single_turn_output},
-                {"role": "user", "content": question[1]},
-            ],
-            tokenize=False,
-            add_generation_prompt=True,
-        )
-
-    multi_turn_questions = df_questions[["questions", "id"]].apply(
-        lambda x: format_double_turn_question(x["questions"], single_turn_outputs[x["id"] - 1]),
-        axis=1,
-    )
-    multi_turn_outputs = [
-        output.outputs[0].text.strip() for output in llm.generate(multi_turn_questions, sampling_params)
-    ]
-
     df_output = pd.DataFrame(
         {
             "id": df_questions["id"],
             "category": df_questions["category"],
             "questions": df_questions["questions"],
-            "outputs": list(zip(single_turn_outputs, multi_turn_outputs)),
+            "outputs": list(zip(single_turn_outputs, single_turn_outputs)),
             "references": df_questions["references"],
         }
     )
