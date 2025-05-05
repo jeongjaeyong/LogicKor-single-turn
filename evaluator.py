@@ -63,12 +63,6 @@ def create_answers(
 
     prompt += f"\n\n**Model's Response**\n{model_outputs[0]}"
 
-    if is_multi_turn:
-        prompt += f"\n\n**Follow-up Question.**\n{model_questions[1]}"
-        if model_references and model_references[1]:
-            prompt += f"\n\n**Additional Reference**\n{model_references[1]}"
-        prompt += f"\n\n**Model's Response**\n{model_outputs[1]}"
-
     prompt += "\n\n[[대화 종료. 평가 시작.]]"
 
     try:
@@ -127,10 +121,8 @@ def create_answers(
 
 def process_item(client, row, judge_model, output_file):
     query_single = create_answers(client, row, judge_model)
-    query_multi = create_answers(client, row, judge_model, is_multi_turn=True)
 
     row["query_single"] = query_single
-    row["query_multi"] = query_multi
     row = row.to_dict()
 
     with LOCK:
