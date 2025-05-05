@@ -62,18 +62,24 @@ for strategy_name, prompts in PROMPT_STRATEGY.items():
         )
 
     single_turn_questions = df_questions["questions"].map(format_single_turn_question)
-    print(single_turn_questions.iloc[0])
+
+    def format_single_turn_refence(references):
+        return references[0]
+    
+    single_turn_references = df_questions["references"].map(format_single_turn_refence)
+    
+        
     single_turn_outputs = [
         output.outputs[0].text.strip() for output in llm.generate(single_turn_questions, sampling_params)
     ]
-
+    
     df_output = pd.DataFrame(
         {
             "id": df_questions["id"],
             "category": df_questions["category"],
-            "questions": df_questions["questions"],
-            "outputs": list(zip(single_turn_outputs, single_turn_outputs)),
-            "references": df_questions["references"],
+            "questions": single_turn_questions,
+            "outputs": single_turn_outputs,
+            "references": single_turn_references,
         }
     )
     df_output.to_json(
