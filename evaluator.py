@@ -144,7 +144,7 @@ def process_file(client, file_path: Path, output_dir: Path, judge_model, threads
 
     with ThreadPoolExecutor(max_workers=threads) as executor:
         for row in df_model_outputs.iterrows():
-            executor.submit(process_item, client, row[1], judge_model, output_file, args.)
+            executor.submit(process_item, client, row[1], judge_model, output_file, args.remove_think)
 
 
 def is_hidden(filepath: Path) -> bool:
@@ -170,7 +170,7 @@ def main():
         if output_file_path.exists():
             print(f"이미 평가 완료.. : {file_path}")
             continue
-        process_file(client, file_path, output_dir, args.judge_model, args.threads, args.remove_think)
+        process_file(client, file_path, output_dir, args.judge_model, args.threads, args)
         time.sleep(20)  # to handle ratelimit!
 
 
