@@ -78,7 +78,7 @@ def create_answers(
                 messages=[
                     {
                         "role": "system",
-                        "content": JUDGE_TEMPLATE["multi_turn" if is_multi_turn else "single_turn"],
+                        "content": JUDGE_TEMPLATE["single_turn"],
                     },
                     {"role": "user", "content": prompt},
                 ],
@@ -91,7 +91,7 @@ def create_answers(
                 messages=[
                     {
                         "role": "system",
-                        "content": JUDGE_TEMPLATE["multi_turn" if is_multi_turn else "single_turn"],
+                        "content": JUDGE_TEMPLATE["single_turn"],
                     },
                     {"role": "user", "content": prompt},
                 ],
