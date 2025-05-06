@@ -55,13 +55,13 @@ def create_answers(
 
     prompt = (
         f"아래의 내용을 주어진 평가 기준들을 충실히 반영하여 평가해라. 특히 모델 답변이 언어 요구사항을 준수하는지 반드시 확인해야 한다.\n\n"
-        f"**Question**\n{model_questions[0]}"
+        f"**Question**\n{model_questions}"
     )
 
     if model_references and model_references[0]:
-        prompt += f"\n\n**Additional Reference**\n{model_references[0]}"
+        prompt += f"\n\n**Additional Reference**\n{model_references}"
 
-    prompt += f"\n\n**Model's Response**\n{model_outputs[0]}"
+    prompt += f"\n\n**Model's Response**\n{model_outputs}"
 
     prompt += "\n\n[[대화 종료. 평가 시작.]]"
 
