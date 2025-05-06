@@ -31,6 +31,7 @@ def get_args():
     parser.add_argument("-j", "--judge-model", help="Judge Model", default="gpt-4-1106-preview")
     parser.add_argument("-t", "--threads", help="Thread count", default=42, type=int)
     parser.add_argument("--azure", help="Use Azure OpenAI", action="store_true")
+    parser.add_argument("--remove_think", help="remove <THINK> area", action="store_true")
     return parser.parse_args()
 
 
@@ -47,12 +48,15 @@ def create_azure_openai_client(api_key: str):
 
 
 def create_answers(
-    client, model_output, judge_model, is_multi_turn: bool = False, i=0
+    client, model_output, judge_model, remove_think: bool = False, i=0
 ) -> Dict[str, Union[str, float]]:
     model_questions = model_output["questions"]
     model_outputs = model_output["outputs"]
     model_references = model_output["references"]
-
+    
+    if remove_think and "<\/think>" in model_questions:
+        model_questions = model_questions.split("<\/think>")[1].strip()
+        
     prompt = (
         f"아래의 내용을 주어진 평가 기준들을 충실히 반영하여 평가해라. 특히 모델 답변이 언어 요구사항을 준수하는지 반드시 확인해야 한다.\n\n"
         f"**Question**\n{model_questions}"
@@ -116,11 +120,11 @@ def create_answers(
                 "judge_score": 0.0,
             }
         i += 1
-        return create_answers(client, model_output, judge_model, is_multi_turn, i)
+        return create_answers(client, model_output, judge_model, remove_think, i)
 
 
-def process_item(client, row, judge_model, output_file):
-    query_single = create_answers(client, row, judge_model)
+def process_item(client, row, judge_model, output_file, remove_think=False):
+    query_single = create_answers(client, row, judge_model, remove_think)
 
     row["query_single"] = query_single
     row = row.to_dict()
@@ -140,7 +144,7 @@ def process_file(client, file_path: Path, output_dir: Path, judge_model, threads
 
     with ThreadPoolExecutor(max_workers=threads) as executor:
         for row in df_model_outputs.iterrows():
-            executor.submit(process_item, client, row[1], judge_model, output_file)
+            executor.submit(process_item, client, row[1], judge_model, output_file, args.)
 
 
 def is_hidden(filepath: Path) -> bool:
@@ -153,7 +157,7 @@ def main():
         client = create_azure_openai_client(args.openai_api_key)
     else:
         client = create_openai_client(args.openai_api_key)
-
+    
     input_dir = Path(args.model_output_dir)
     output_dir = Path("./evaluated")
 
@@ -166,7 +170,7 @@ def main():
         if output_file_path.exists():
             print(f"이미 평가 완료.. : {file_path}")
             continue
-        process_file(client, file_path, output_dir, args.judge_model, args.threads, args)
+        process_file(client, file_path, output_dir, args.judge_model, args.threads, args.remove_think)
         time.sleep(20)  # to handle ratelimit!
 
 
