@@ -58,7 +58,7 @@ def create_answers(
         f"**Question**\n{model_questions}"
     )
 
-    if model_references and model_references[0]:
+    if model_references:
         prompt += f"\n\n**Additional Reference**\n{model_references}"
 
     prompt += f"\n\n**Model's Response**\n{model_outputs}"
