@@ -64,7 +64,7 @@ def main():
     for strategy_name, prompts in PROMPT_STRATEGY.items():
         # 질문 포맷 함수
         def format_q(question):
-            return llm.llm_engine.tokenizer.apply_chat_template(
+            return llm.llm_engine.tokenizer.tokenizer.apply_chat_template(
                 prompts + [{"role": "user", "content": question[0]}],
                 tokenize=False,
                 add_generation_prompt=True,
